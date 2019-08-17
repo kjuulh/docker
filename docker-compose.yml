@@ -1,0 +1,318 @@
+version: "3.6"
+services:
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    restart: always
+    command: -H unix:///var/run/docker.sock
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${HOMESERVER_DIR}/docker/portainer/data:/data
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    environment:
+      - TZ=${TZ}
+
+  organizr:
+    container_name: organizr
+    restart: always
+    image: organizrtools/organizr-v2
+    volumes:
+      - ${HOMESERVER_DIR}/docker/organizr:/config
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9080:80"
+      - "9443:443"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+  # phpmyadmin:
+  #   hostname: phpmyadmin
+  #   container_name: phpmyadmin
+  #   image: phpmyadmin/phpmyadmin
+  #   restart: always
+  #   links:
+  #     - mariadb:db
+  #   ports:
+  #     - 9880:80
+  #   environment:
+  #     - PMA_HOST=mariadb
+  #     - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
+  # mariadb:
+  #   image: "linuxserver/mariadb"
+  #   container_name: "mariadb"
+  #   hostname: mariadb
+  #   volumes:
+  #     - ${HOMESERVER_DIR}/docker/mariadb:/config
+  #   ports:
+  #     - target: 3306
+  #       published: 3306
+  #       protocol: tcp
+  #       mode: host
+  #   restart: always
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+
+  watchtower:
+    container_name: watchtower
+    restart: always
+    image: v2tec/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 0 4 * * *" --cleanup
+
+  # homeassistant:
+  #   container_name: homeassistant
+  #   restart: always
+  #   image: homeassistant/home-assistant
+  #   #    devices:
+  #   #      - /dev/ttyUSB0:/dev/ttyUSB0
+  #   #      - /dev/ttyUSB1:/dev/ttyUSB1
+  #   #      - /dev/ttyACM0:/dev/ttyACM0
+  #   volumes:
+  #     - ${HOMESERVER_DIR}/docker/homeassistant:/config
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${HOMESERVER_DIR}/docker/shared:/shared
+  #   ports:
+  #     - "9001:8123"
+  #   privileged: true
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+
+  deluge:
+    image: "linuxserver/deluge"
+    container_name: "deluge"
+    volumes:
+      - ${HOMESERVER_DIR}/docker/deluge:/config
+      - ${NAS_DIR}/media/downloads/complete:/downloads
+      - ${NAS_DIR}/media/downloads/incomplete:/incomplete
+      - ${NAS_DIR}/media/downloads/ongoing:/ongoing
+      - ${NAS_DIR}/media/downloads/torrents:/torrents
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9002:8112"
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=002
+
+  radarr:
+    image: "linuxserver/radarr"
+    container_name: "radarr"
+    volumes:
+      - ${HOMESERVER_DIR}/docker/radarr:/config
+      - ${NAS_DIR}/media/downloads/complete:/downloads
+      - ${NAS_DIR}/media/Media/Movies:/movies
+      - ${NAS_DIR}/media/Media/Audio:/audio
+      - ${NAS_DIR}/media/Media/Photos:/photos
+      - ${NAS_DIR}/media/Media/PN:/Porn
+      - "/etc/localtime:/etc/localtime:ro"
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9003:7878"
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=022 #optional
+
+  sonarr:
+    image: "linuxserver/sonarr"
+    container_name: "sonarr"
+    volumes:
+      - ${HOMESERVER_DIR}/docker/sonarr:/config
+      - ${NAS_DIR}/media/downloads/complete:/downloads
+      - ${NAS_DIR}/media/Media/TV-Shows:/tv
+      - ${NAS_DIR}/media/Media/Anime:/anime
+      - "/etc/localtime:/etc/localtime:ro"
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9004:8989"
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=022 #optional
+
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=022 #optional
+    volumes:
+      - ${HOMESERVER_DIR}/docker/bazarr:/config
+      - ${NAS_DIR}/media/Media/Movies:/movies
+      - ${NAS_DIR}/media/Media/TV-Shows:/tv
+      - ${NAS_DIR}/media/Media/Anime:/anime
+    ports:
+      - 9009:6767
+    restart: unless-stopped
+
+  plexms:
+    container_name: plexms
+    restart: always
+    image: plexinc/pms-docker
+    volumes:
+      - ${HOMESERVER_DIR}/docker/plexms:/config
+      - ${NAS_DIR}/media/downloads/plex_tmp:/transcode
+      - ${NAS_DIR}/media/Media:/media
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "32400:32400/tcp"
+      - "3005:3005/tcp"
+      - "8324:8324/tcp"
+      - "32469:32469/tcp"
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+    environment:
+      - TZ=${TZ}
+      - HOSTNAME="hermansen-plex"
+      - PLEX_CLAIM="claim-TsXXeN-vcuzizazodXvZ"
+      - PLEX_UID=${PUID}
+      - PLEX_GID=${PGID}
+      - ADVERTISE_IP="http://hermansen-pc:32400/"
+
+  tautulli:
+    container_name: tautulli
+    restart: always
+    image: linuxserver/tautulli
+    volumes:
+      - ${HOMESERVER_DIR}/docker/tautulli/config:/config
+      - ${HOMESERVER_DIR}/docker/tautulli/logs:/logs:ro
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9005:8181"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+  ombi:
+    container_name: ombi
+    restart: always
+    image: linuxserver/ombi
+    volumes:
+      - ${HOMESERVER_DIR}/docker/ombi:/config
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9006:3579"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+  jackett:
+    image: "linuxserver/jackett"
+    container_name: "jackett"
+    volumes:
+      - ${HOMESERVER_DIR}/docker/jackett:/config
+      - ${NAS_DIR}/downloads/complete:/downloads
+      - "/etc/localtime:/etc/localtime:ro"
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9007:9117"
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+  nextcloud:
+    container_name: nextcloud
+    restart: always
+    image: linuxserver/nextcloud
+    volumes:
+      - ${HOMESERVER_DIR}/docker/nextcloud:/config
+      - ${HOMESERVER_DIR}/shared_data:/data
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9008:443"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    depends_on:
+      - postgres
+
+  traefik:
+    hostname: traefik
+    image: traefik:latest
+    container_name: traefik
+    restart: always
+    domainname: ${DOMAINNAME}
+    command: --web --docker --docker.domain=localhost --logLevel=DEBUG
+    networks:
+      - default
+      - traefik_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.frontend.rule=Host:traefik.${DOMAINNAME}"
+      #      - "traefik.frontend.rule=Host:${DOMAINNAME}; PathPrefixStrip: /traefik"
+      - "traefik.port=8080"
+      # - "traefik.docker.network=traefik_proxy"
+      # - "traefik.frontend.headers.SSLRedirect=false"
+      # - "traefik.frontend.headers.STSSeconds=315360000"
+      # - "traefik.frontend.headers.browserXSSFilter=true"
+      # - "traefik.frontend.headers.contentTypeNosniff=true"
+      # - "traefik.frontend.headers.forceSTSHeader=true"
+      # - "traefik.frontend.headers.SSLHost=example.com"
+      # - "traefik.frontend.headers.STSIncludeSubdomains=true"
+      # - "traefik.frontend.headers.STSPreload=true"
+      # - "traefik.frontend.headers.frameDeny=true"
+      # - "traefik.frontend.auth.basic.users=${HTTP_USERNAME}:${HTTP_PASSWORD}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${HOMESERVER_DIR}/docker/traefik:/etc/traefik
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+      - /dev/null:/traefik.toml
+
+  postgres:
+    image: postgres:alpine
+    restart: always
+    ports:
+      - 9432:5432
+    environment:
+      POSTGRES_USER: hermansen
+      POSTGRES_PASSWORD: Blizzar1
+    volumes:
+      - ${HOMESERVER_DIR}/docker/postgres/data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 9010:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: hermansendev@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: Blizzar1
+    volumes:
+      - ${HOMESERVER_DIR}/docker/pgadmin:/var/lib/pgadmin
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+  default:
+    driver: bridge
