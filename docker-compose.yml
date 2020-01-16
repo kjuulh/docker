@@ -185,8 +185,8 @@ services:
     environment:
       - TZ=${TZ}
       - HOSTNAME="hermansen-server"
- #    - PLEX_CLAIM="claim-TsXXeN-vcuzizazodXvZ"
- #     - PLEX_CLAIM="claim-KhZnzcjftS7FsPWx1ACp"
+      #    - PLEX_CLAIM="claim-TsXXeN-vcuzizazodXvZ"
+      #     - PLEX_CLAIM="claim-KhZnzcjftS7FsPWx1ACp"
       - PLEX_UID=${PUID}
       - PLEX_GID=${PGID}
       - ADVERTISE_IP="http://192.168.1.254:32400/"
@@ -266,43 +266,43 @@ services:
       - 8012:8081
     restart: unless-stopped
 
-#  traefik:
-#    hostname: traefik
-#    image: traefik:latest
-#    container_name: traefik
-#    restart: always
-#    domainname: ${DOMAINNAME}
-#    command: --web --docker --docker.domain=localhost --logLevel=DEBUG
-#    networks:
-#      - default
-#      - traefik_proxy
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#      - "8080:8080"
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.backend=traefik"
-#      - "traefik.frontend.rule=Host:traefik.${DOMAINNAME}"
-#      #      - "traefik.frontend.rule=Host:${DOMAINNAME}; PathPrefixStrip: /traefik"
-#      - "traefik.port=8080"
-#      # - "traefik.docker.network=traefik_proxy"
-#      # - "traefik.frontend.headers.SSLRedirect=false"
-#      # - "traefik.frontend.headers.STSSeconds=315360000"
-#      # - "traefik.frontend.headers.browserXSSFilter=true"
-#      # - "traefik.frontend.headers.contentTypeNosniff=true"
-#      # - "traefik.frontend.headers.forceSTSHeader=true"
-#      # - "traefik.frontend.headers.SSLHost=example.com"
-#      # - "traefik.frontend.headers.STSIncludeSubdomains=true"
-#      # - "traefik.frontend.headers.STSPreload=true"
-#      # - "traefik.frontend.headers.frameDeny=true"
-#      # - "traefik.frontend.auth.basic.users=${HTTP_USERNAME}:${HTTP_PASSWORD}"
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-#      - ${HOMESERVER_DIR}/docker/traefik:/etc/traefik
-#      - ${HOMESERVER_DIR}/docker/shared:/shared
-#      - /dev/null:/traefik.toml
-#
+  #  traefik:
+  #    hostname: traefik
+  #    image: traefik:latest
+  #    container_name: traefik
+  #    restart: always
+  #    domainname: ${DOMAINNAME}
+  #    command: --web --docker --docker.domain=localhost --logLevel=DEBUG
+  #    networks:
+  #      - default
+  #      - traefik_proxy
+  #    ports:
+  #      - "80:80"
+  #      - "443:443"
+  #      - "8080:8080"
+  #    labels:
+  #      - "traefik.enable=true"
+  #      - "traefik.backend=traefik"
+  #      - "traefik.frontend.rule=Host:traefik.${DOMAINNAME}"
+  #      #      - "traefik.frontend.rule=Host:${DOMAINNAME}; PathPrefixStrip: /traefik"
+  #      - "traefik.port=8080"
+  #      # - "traefik.docker.network=traefik_proxy"
+  #      # - "traefik.frontend.headers.SSLRedirect=false"
+  #      # - "traefik.frontend.headers.STSSeconds=315360000"
+  #      # - "traefik.frontend.headers.browserXSSFilter=true"
+  #      # - "traefik.frontend.headers.contentTypeNosniff=true"
+  #      # - "traefik.frontend.headers.forceSTSHeader=true"
+  #      # - "traefik.frontend.headers.SSLHost=example.com"
+  #      # - "traefik.frontend.headers.STSIncludeSubdomains=true"
+  #      # - "traefik.frontend.headers.STSPreload=true"
+  #      # - "traefik.frontend.headers.frameDeny=true"
+  #      # - "traefik.frontend.auth.basic.users=${HTTP_USERNAME}:${HTTP_PASSWORD}"
+  #    volumes:
+  #      - /var/run/docker.sock:/var/run/docker.sock:ro
+  #      - ${HOMESERVER_DIR}/docker/traefik:/etc/traefik
+  #      - ${HOMESERVER_DIR}/docker/shared:/shared
+  #      - /dev/null:/traefik.toml
+  #
   postgres:
     image: postgres:alpine
     restart: always
@@ -334,7 +334,20 @@ services:
       - 80:80
     restart: unless-stopped
 
-
+  calibre-web:
+    image: linuxserver/calibre-web
+    container_name: calibre-web
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/calibre-web:calibre
+    volumes:
+      - ${HOMESERVER_DIR}/docker/calibre-web:/config
+      - ${NAS_DIR}/media/books:/books
+    ports:
+      - 9013:8083
+    restart: unless-stopped
 #  pgadmin:
 #    image: dpage/pgadmin4
 #    restart: always
