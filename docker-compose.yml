@@ -234,6 +234,22 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+
+  calibre:
+    image: linuxserver/calibre
+    container_name: calibre
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - GUAC_USER=abc #optional
+      - GUAC_PASS=900150983cd24fb0d6963f7d28e17f72 #optional
+    volumes:
+      - ${HOMESERVER_DIR}/docker/calibre:/config
+    ports:
+      - 9011:8080
+      - 8012:8081
+    restart: unless-stopped
 #  nextcloud:
 #    container_name: nextcloud
 #    restart: always
