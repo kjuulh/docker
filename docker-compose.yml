@@ -345,7 +345,7 @@ services:
     volumes:
       - ${HOMESERVER_DIR}/docker/calibre-web:/config
       - ${NAS_DIR}/media/books:/books
-      - ${HOMESERVER_DIR}/docker/calibre/Calibre\ Library:/db
+      - ${HOMESERVER_DIR}/docker/calibre/Calibre Library:/db
     ports:
       - 9013:8083
     restart: unless-stopped
