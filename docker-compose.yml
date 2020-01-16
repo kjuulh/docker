@@ -184,11 +184,12 @@ services:
       - "32414:32414/udp"
     environment:
       - TZ=${TZ}
-      - HOSTNAME="hermansen-plex"
-      - PLEX_CLAIM="claim-TsXXeN-vcuzizazodXvZ"
+      - HOSTNAME="hermansen-server"
+ #    - PLEX_CLAIM="claim-TsXXeN-vcuzizazodXvZ"
+ #     - PLEX_CLAIM="claim-KhZnzcjftS7FsPWx1ACp"
       - PLEX_UID=${PUID}
       - PLEX_GID=${PGID}
-      - ADVERTISE_IP="http://hermansen-pc:32400/"
+      - ADVERTISE_IP="http://192.168.1.254:32400/"
   #
   #  tautulli:
   #    container_name: tautulli
@@ -234,22 +235,22 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-#  nextcloud:
-#    container_name: nextcloud
-#    restart: always
-#    image: linuxserver/nextcloud
-#    volumes:
-#      - ${HOMESERVER_DIR}/docker/nextcloud:/config
-#      - ${HOMESERVER_DIR}/shared_data:/data
-#      - ${HOMESERVER_DIR}/docker/shared:/shared
-#    ports:
-#      - "9008:443"
-#    environment:
-#      - PUID=${PUID}
-#      - PGID=${PGID}
-#    depends_on:
-#      - postgres
-#
+  nextcloud:
+    container_name: nextcloud
+    restart: always
+    image: linuxserver/nextcloud
+    volumes:
+      - ${HOMESERVER_DIR}/docker/nextcloud:/config
+      - ${HOMESERVER_DIR}/shared_data:/data
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9008:443"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    depends_on:
+      - postgres
+
 #  traefik:
 #    hostname: traefik
 #    image: traefik:latest
@@ -287,17 +288,38 @@ services:
 #      - ${HOMESERVER_DIR}/docker/shared:/shared
 #      - /dev/null:/traefik.toml
 #
-#  postgres:
-#    image: postgres:alpine
-#    restart: always
-#    ports:
-#      - 9432:5432
-#    environment:
-#      POSTGRES_USER: hermansen
-#      POSTGRES_PASSWORD: Blizzar1
-#    volumes:
-#      - ${HOMESERVER_DIR}/docker/postgres/data:/var/lib/postgresql/data
-#
+  postgres:
+    image: postgres:alpine
+    restart: always
+    ports:
+      - 9432:5432
+    environment:
+      POSTGRES_USER: hermansen
+      POSTGRES_PASSWORD: Blizzar1
+    volumes:
+      - ${HOMESERVER_DIR}/docker/postgres/data:/var/lib/postgresql/data
+
+  letsencrypt:
+    image: linuxserver/letsencrypt
+    container_name: letsencrypt
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${PUID}
+      - GUID=${PGID}
+      - TZ=${TZ}
+      - URL=kjuulh.io
+      - VALIDATION=http
+      - DHLEVEL=2048
+      - ONLY_SUBDOMAINS=false
+    volumes:
+      - ${HOMESERVER_DIR}/docker/letsencrypt/data:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+
+
 #  pgadmin:
 #    image: dpage/pgadmin4
 #    restart: always
