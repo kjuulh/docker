@@ -208,22 +208,14 @@ services:
   firefly:
     image: jc5x/firefly-iii:latest
     restart: always
-    ports: 
-    - 9014:80
-    environment: 
-      DB_HOST: 192.168.1.199
-      DB_PORT: 9432
-      APP_KEY: GBbm6fre2TaueqqJNFn6YJJzRAw6of8l
-      DB_DATABASE: firefly
-      DB_USERNAME: hermansen
-      DB_PASSWORD: Blizzar1
-      DB_CONNECTION: postgres
-      ServerName: hermansen-server
-    volumes: 
-    - ${HOMESERVER_DIR}/docker/firefly/export:/var/www/firefly-iii/storage/export
-    - ${HOMESERVER_DIR}/docker/firefly/upload:/var/www/firefly-iii/storage/upload
+    ports:
+      - 9014:80
+    env_file: firefly-iii.env
+    volumes:
+      - ${HOMESERVER_DIR}/docker/firefly/export:/var/www/firefly-iii/storage/export
+      - ${HOMESERVER_DIR}/docker/firefly/upload:/var/www/firefly-iii/storage/upload
     depends_on:
-    - postgres
+      - postgres
 
   letsencrypt:
     image: linuxserver/letsencrypt
