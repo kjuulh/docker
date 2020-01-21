@@ -33,7 +33,7 @@ services:
       - ${NAS_DIR}/media/downloads/torrents:/torrents
       - ${HOMESERVER_DIR}/docker/shared:/shared
     ports:
-      - "9002:8112";
+      - "9002:8112"
     restart: always
     environment:
       - PUID=${PUID}
@@ -208,14 +208,17 @@ services:
   firefly:
     image: jc5x/firefly-iii:latest
     restart: always
-    ports: 9014:80
+    ports: 
+    - 9014:80
     environment: 
-      DB_HOST=192.168.1.199
-      DB_PORT=9432
-      APP_KEY=GBbm6fre2TaueqqJNFn6YJJzRAw6of8l
-      DB_DATABASE=firefly
-      DB_USERNAME=hermansen
-      DB_PASSWORD=Blizzar1
+      DB_HOST: 192.168.1.199
+      DB_PORT: 9432
+      APP_KEY: GBbm6fre2TaueqqJNFn6YJJzRAw6of8l
+      DB_DATABASE: firefly
+      DB_USERNAME: hermansen
+      DB_PASSWORD: Blizzar1
+      DB_CONNECTION: postgres
+      ServerName: hermansen-server
     volumes: 
     - ${HOMESERVER_DIR}/docker/firefly/export:/var/www/firefly-iii/storage/export
     - ${HOMESERVER_DIR}/docker/firefly/upload:/var/www/firefly-iii/storage/upload
