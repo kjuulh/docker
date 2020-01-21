@@ -14,52 +14,6 @@ services:
     environment:
       - TZ=${TZ}
 
-  #  organizr:
-  #    container_name: organizr
-  #    restart: always
-  #    image: organizrtools/organizr-v2
-  #    volumes:
-  #      - ${HOMESERVER_DIR}/docker/organizr:/config
-  #      - ${HOMESERVER_DIR}/docker/shared:/shared
-  #    ports:
-  #      - "9080:80"
-  #      - "9443:443"
-  #    environment:
-  #      - PUID=${PUID}
-  #      - PGID=${PGID}
-  #      - TZ=${TZ}
-  #
-  # phpmyadmin:
-  #   hostname: phpmyadmin
-  #   container_name: phpmyadmin
-  #   image: phpmyadmin/phpmyadmin
-  #   restart: always
-  #   links:
-  #     - mariadb:db
-  #   ports:
-  #     - 9880:80
-  #   environment:
-  #     - PMA_HOST=mariadb
-  #     - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-
-  # mariadb:
-  #   image: "linuxserver/mariadb"
-  #   container_name: "mariadb"
-  #   hostname: mariadb
-  #   volumes:
-  #     - ${HOMESERVER_DIR}/docker/mariadb:/config
-  #   ports:
-  #     - target: 3306
-  #       published: 3306
-  #       protocol: tcp
-  #       mode: host
-  #   restart: always
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-
   watchtower:
     container_name: watchtower
     restart: always
@@ -67,26 +21,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --schedule "0 0 4 * * *" --cleanup
-
-  # homeassistant:
-  #   container_name: homeassistant
-  #   restart: always
-  #   image: homeassistant/home-assistant
-  #   #    devices:
-  #   #      - /dev/ttyUSB0:/dev/ttyUSB0
-  #   #      - /dev/ttyUSB1:/dev/ttyUSB1
-  #   #      - /dev/ttyACM0:/dev/ttyACM0
-  #   volumes:
-  #     - ${HOMESERVER_DIR}/docker/homeassistant:/config
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - ${HOMESERVER_DIR}/docker/shared:/shared
-  #   ports:
-  #     - "9001:8123"
-  #   privileged: true
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
 
   deluge:
     image: "linuxserver/deluge"
@@ -99,7 +33,7 @@ services:
       - ${NAS_DIR}/media/downloads/torrents:/torrents
       - ${HOMESERVER_DIR}/docker/shared:/shared
     ports:
-      - "9002:8112"
+      - "9002:8112";
     restart: always
     environment:
       - PUID=${PUID}
@@ -189,22 +123,7 @@ services:
       - PLEX_UID=${PUID}
       - PLEX_GID=${PGID}
       - ADVERTISE_IP="http://hermansen-pc:32400/"
-  #
-  #  tautulli:
-  #    container_name: tautulli
-  #    restart: always
-  #    image: linuxserver/tautulli
-  #    volumes:
-  #      - ${HOMESERVER_DIR}/docker/tautulli/config:/config
-  #      - ${HOMESERVER_DIR}/docker/tautulli/logs:/logs:ro
-  #      - ${HOMESERVER_DIR}/docker/shared:/shared
-  #    ports:
-  #      - "9005:8181"
-  #    environment:
-  #      - PUID=${PUID}
-  #      - PGID=${PGID}
-  #      - TZ=${TZ}
-  #
+
   ombi:
     container_name: ombi
     restart: always
@@ -234,81 +153,44 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-#  nextcloud:
-#    container_name: nextcloud
-#    restart: always
-#    image: linuxserver/nextcloud
-#    volumes:
-#      - ${HOMESERVER_DIR}/docker/nextcloud:/config
-#      - ${HOMESERVER_DIR}/shared_data:/data
-#      - ${HOMESERVER_DIR}/docker/shared:/shared
-#    ports:
-#      - "9008:443"
-#    environment:
-#      - PUID=${PUID}
-#      - PGID=${PGID}
-#    depends_on:
-#      - postgres
-#
-#  traefik:
-#    hostname: traefik
-#    image: traefik:latest
-#    container_name: traefik
-#    restart: always
-#    domainname: ${DOMAINNAME}
-#    command: --web --docker --docker.domain=localhost --logLevel=DEBUG
-#    networks:
-#      - default
-#      - traefik_proxy
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#      - "8080:8080"
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.backend=traefik"
-#      - "traefik.frontend.rule=Host:traefik.${DOMAINNAME}"
-#      #      - "traefik.frontend.rule=Host:${DOMAINNAME}; PathPrefixStrip: /traefik"
-#      - "traefik.port=8080"
-#      # - "traefik.docker.network=traefik_proxy"
-#      # - "traefik.frontend.headers.SSLRedirect=false"
-#      # - "traefik.frontend.headers.STSSeconds=315360000"
-#      # - "traefik.frontend.headers.browserXSSFilter=true"
-#      # - "traefik.frontend.headers.contentTypeNosniff=true"
-#      # - "traefik.frontend.headers.forceSTSHeader=true"
-#      # - "traefik.frontend.headers.SSLHost=example.com"
-#      # - "traefik.frontend.headers.STSIncludeSubdomains=true"
-#      # - "traefik.frontend.headers.STSPreload=true"
-#      # - "traefik.frontend.headers.frameDeny=true"
-#      # - "traefik.frontend.auth.basic.users=${HTTP_USERNAME}:${HTTP_PASSWORD}"
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-#      - ${HOMESERVER_DIR}/docker/traefik:/etc/traefik
-#      - ${HOMESERVER_DIR}/docker/shared:/shared
-#      - /dev/null:/traefik.toml
-#
-#  postgres:
-#    image: postgres:alpine
-#    restart: always
-#    ports:
-#      - 9432:5432
-#    environment:
-#      POSTGRES_USER: hermansen
-#      POSTGRES_PASSWORD: Blizzar1
-#    volumes:
-#      - ${HOMESERVER_DIR}/docker/postgres/data:/var/lib/postgresql/data
-#
-#  pgadmin:
-#    image: dpage/pgadmin4
-#    restart: always
-#    ports:
-#      - 9010:80
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: hermansendev@gmail.com
-#      PGADMIN_DEFAULT_PASSWORD: Blizzar1
-#    volumes:
-#      - ${HOMESERVER_DIR}/docker/pgadmin:/var/lib/pgadmin
-#
+
+  postgres:
+    image: postgres:alpine
+    restart: always
+    ports:
+      - 9432:5432
+    environment:
+      POSTGRES_USER: hermansen
+      POSTGRES_PASSWORD: Blizzar1
+    volumes:
+      - ${HOMESERVER_DIR}/docker/postgres/data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 9010:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: hermansendev@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: Blizzar1
+    volumes:
+      - ${HOMESERVER_DIR}/docker/pgadmin:/var/lib/pgadmin
+
+  firefly:
+    image: jc5x/firefly-iii:latest
+    restart: always
+    ports: 9014:80
+    environment: 
+      DB_HOST=192.168.1.199
+      DB_PORT=9432
+      APP_KEY=GBbm6fre2TaueqqJNFn6YJJzRAw6of8l
+      DB_DATABASE=firefly
+      DB_USERNAME=hermansen
+      DB_PASSWORD=Blizzar1
+    volumes: 
+    - ${HOMESERVER_DIR}/docker/firefly/export:/var/www/firefly-iii/storage/export
+    - ${HOMESERVER_DIR}/docker/firefly/upload:/var/www/firefly-iii/storage/upload
+
 #networks:
 #  traefik_proxy:
 #    external:
