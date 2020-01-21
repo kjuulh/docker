@@ -118,11 +118,10 @@ services:
       - "32414:32414/udp"
     environment:
       - TZ=${TZ}
-      - HOSTNAME="hermansen-plex"
-      - PLEX_CLAIM="claim-TsXXeN-vcuzizazodXvZ"
+      - HOSTNAME="hermansen-server"
       - PLEX_UID=${PUID}
       - PLEX_GID=${PGID}
-      - ADVERTISE_IP="http://hermansen-pc:32400/"
+      - ADVERTISE_IP="http://192.168.1.254:32400/"
 
   ombi:
     container_name: ombi
@@ -153,6 +152,36 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+
+  nextcloud:
+    container_name: nextcloud
+    restart: always
+    image: linuxserver/nextcloud
+    volumes:
+      - ${HOMESERVER_DIR}/docker/nextcloud:/config
+      - ${HOMESERVER_DIR}/shared_data:/data
+      - ${HOMESERVER_DIR}/docker/shared:/shared
+    ports:
+      - "9008:443"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    depends_on:
+      - postgres
+
+  calibre:
+    image: linuxserver/calibre
+    container_name: calibre
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${HOMESERVER_DIR}/docker/calibre:/config
+    ports:
+      - 9011:8080
+      - 8012:8081
+    restart: unless-stopped
 
   postgres:
     image: postgres:alpine
@@ -190,10 +219,41 @@ services:
     volumes: 
     - ${HOMESERVER_DIR}/docker/firefly/export:/var/www/firefly-iii/storage/export
     - ${HOMESERVER_DIR}/docker/firefly/upload:/var/www/firefly-iii/storage/upload
+    depends_on:
+    - postgres
 
-#networks:
-#  traefik_proxy:
-#    external:
-#      name: traefik_proxy
-#  default:
-#    driver: bridge
+  letsencrypt:
+    image: linuxserver/letsencrypt
+    container_name: letsencrypt
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${PUID}
+      - GUID=${PGID}
+      - TZ=${TZ}
+      - URL=kjuulh.io
+      - VALIDATION=http
+      - DHLEVEL=2048
+      - ONLY_SUBDOMAINS=false
+    volumes:
+      - ${HOMESERVER_DIR}/docker/letsencrypt/data:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+
+  calibre-web:
+    image: linuxserver/calibre-web
+    container_name: calibre-web
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/calibre-web:calibre
+    volumes:
+      - ${HOMESERVER_DIR}/docker/calibre-web:/config
+      - ${NAS_DIR}/media/books:/books
+      - ${HOMESERVER_DIR}/docker/calibre/Calibre Library:/db
+    ports:
+      - 9013:8083
+    restart: unless-stopped
