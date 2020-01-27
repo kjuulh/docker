@@ -230,6 +230,8 @@ services:
       - VALIDATION=http
       - DHLEVEL=2048
       - ONLY_SUBDOMAINS=false
+      - SUBDOMAINS=go,www
+      - EMAIL=hermansendev@gmail.com
     volumes:
       - ${HOMESERVER_DIR}/docker/letsencrypt/data:/config
     ports:
