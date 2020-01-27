@@ -252,3 +252,13 @@ services:
     ports:
       - 9013:8083
     restart: unless-stopped
+
+  invoiceninja:
+    image: invoiceninja/invoiceninja
+    restart: always
+    ports:
+      - 9000:9000
+    env_file: env/ninja.env
+    volumes:
+      - ${HOMESERVER_DIR}/docker/ninja/logo:/var/www/app/public/logo
+      - ${HOMESERVER_DIR}/docker/ninja/storage:/var/www/app/storage

@@ -1,0 +1,19 @@
+{
+  "has-headers": true,
+  "date-format": "d-m-Y",
+  "delimiter": ";",
+  "import-account": 0,
+  "specifics": [],
+  "column-count": 4,
+  "column-roles": ["date-transaction", "description", "amount", "_ignore"],
+  "column-do-mapping": [true, true, true, false],
+  "column-roles-complete": false,
+  "column-mapping-config": {
+    "1": [],
+    "2": [],
+    "3": []
+  },
+  "column-mapping-complete": false,
+  "apply_rules": true,
+  "match_bills": true
+}
