@@ -4,8 +4,8 @@ services:
   drone:
     image: drone/drone:1
     ports:
-      - 9015:80
-      - 9016:443
+      - 9017:80
+      - 9018:443
     restart: always
     volumes:
       - ./data:/data
