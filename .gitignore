@@ -5,3 +5,4 @@ env/ninja.env
 drone/env/drone-runner.env
 drone/env/drone.env
 ninja/.env
+data/
